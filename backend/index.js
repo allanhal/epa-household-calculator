@@ -1,18 +1,27 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import "dotenv/config.js";
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
 const EMISSION_FACTORS = {
-  electricity: 0.92, // lbs CO₂ per kWh (national average)
-  naturalGas: 11.7, // lbs CO₂ per therm
-  fuelOil: 22.4, // lbs CO₂ per gallon
-  propane: 12.7, // lbs CO₂ per gallon
-  gasoline: 19.6, // lbs CO₂ per gallon
-  diesel: 22.4, // lbs CO₂ per gallon
+  electricity: process.env.ELECTRICITY_EMISSION_FACTOR || 0.92, // lbs CO₂ per kWh (national average)
+  naturalGas: process.env.NATURAL_GAS_EMISSION_FACTOR || 11.7, // lbs CO₂ per therm
+  fuelOil: process.env.FUEL_OIL_EMISSION_FACTOR || 22.4, // lbs CO₂ per gallon
+  propane: process.env.PROPANE_EMISSION_FACTOR || 12.7, // lbs CO₂ per gallon
+  gasoline: process.env.GASOLINE_EMISSION_FACTOR || 19.6, // lbs CO₂ per gallon
+  diesel: process.env.DIESEL_EMISSION_FACTOR || 22.4, // lbs CO₂ per gallon
+};
+
+const WASTE = {
+  perPerson: process.env.PER_PERSON_WASTE || 692, // lbs CO₂ per person per year
+  paper: process.env.PAPER_WASTE || 184, // lbs CO₂ saved recycling paper
+  plastic: process.env.PLASTIC_WASTE || 25, // lbs CO₂ saved recycling plastic
+  metal: process.env.METAL_WASTE || 166, // lbs CO₂ saved recycling metal
+  glass: process.env.GLASS_WASTE || 46, // lbs CO₂ saved recycling glass
 };
 
 app.post("/api/calculate", (req, res) => {
@@ -45,17 +54,16 @@ app.post("/api/calculate", (req, res) => {
     }
 
     if (household.waste) {
-      let wasteEmissions = (household.waste.people || 1) * 692;
-      if (household.waste.recyclesPaper) wasteEmissions -= 184;
-      if (household.waste.recyclesPlastic) wasteEmissions -= 25;
-      if (household.waste.recyclesMetal) wasteEmissions -= 166;
-      if (household.waste.recyclesGlass) wasteEmissions -= 46;
+      let wasteEmissions = (household.waste.people || 1) * WASTE.perPerson;
+      if (household.waste.recyclesPaper) wasteEmissions -= WASTE.paper;
+      if (household.waste.recyclesPlastic) wasteEmissions -= WASTE.plastic;
+      if (household.waste.recyclesMetal) wasteEmissions -= WASTE.metal;
+      if (household.waste.recyclesGlass) wasteEmissions -= WASTE.glass;
       totalEmissions += wasteEmissions;
     }
 
     res.json({
       totalEmissions: totalEmissions.toFixed(2),
-      metricTons: (totalEmissions / 2204.62).toFixed(2),
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

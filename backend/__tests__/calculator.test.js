@@ -25,6 +25,5 @@ describe("EPA Calculator API", () => {
 
     // Match expected output from your curl example
     expect(response.body.totalEmissions).toBe("12642.00");
-    expect(response.body.metricTons).toBe("5.73");
   });
 });
