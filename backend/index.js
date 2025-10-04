@@ -24,6 +24,14 @@ const WASTE = {
   glass: process.env.GLASS_WASTE || 46, // lbs CO₂ saved recycling glass
 };
 
+app.get("/", (_, res) => {
+  res.redirect("/api");
+});
+
+app.get("/api", (req, res) => {
+  res.send("EPA Household Carbon Footprint Calculator API");
+});
+
 app.post("/api/calculate", (req, res) => {
   try {
     const { household } = req.body;
@@ -72,7 +80,8 @@ app.post("/api/calculate", (req, res) => {
 
 // Do not start server when doing unit tests
 if (process.env.NODE_ENV !== "test") {
-  app.listen(8080, () =>
+  const port = process.env.PORT || 8080;
+  app.listen(port, () =>
     console.log("EPA Calculator API running on http://localhost:8080")
   );
 }

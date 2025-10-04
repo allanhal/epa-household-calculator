@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-// Importing Icons for a nice touch, typically from @mui/icons-material
 import BoltIcon from '@mui/icons-material/Bolt';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -11,22 +10,41 @@ import {
     TextField, Typography
 } from '@mui/material';
 
+import SvgLogo from './SvgLogo';
+
 import type { HouseholdData, Status, TransportationData } from "./types";
+
+const API_URL = import.meta.env.VITE_API || "http://localhost:8080";
+
+// const initialState = {
+//   energy: { electricity: 1, naturalGas: 1 },
+//   transportation: [{ miles: 1, mpg: 1 }],
+//   waste: {
+//     people: 1,
+//     recyclesPaper: false,
+//     recyclesPlastic: false,
+//     recyclesMetal: false,
+//     recyclesGlass: false,
+//   },
+// };
+
+const initialState = {
+  energy: { electricity: 0, naturalGas: 0 },
+  transportation: [{ miles: 0, mpg: 0 }],
+  waste: {
+    people: 1,
+    recyclesPaper: false,
+    recyclesPlastic: false,
+    recyclesMetal: false,
+    recyclesGlass: false,
+  },
+};
+
 function App() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [status, setStatus] = useState<Status>("idle");
-  const [data, setData] = useState<HouseholdData>({
-    energy: { electricity: 0, naturalGas: 0 },
-    transportation: [{ miles: 0, mpg: 0 }],
-    waste: {
-      people: 1,
-      recyclesPaper: false,
-      recyclesPlastic: false,
-      recyclesMetal: false,
-      recyclesGlass: false,
-    },
-  });
+  const [data, setData] = useState<HouseholdData>(initialState);
 
   const updateEnergy = (key: "electricity" | "naturalGas", value: number) => {
     setData((prev) => ({
@@ -41,7 +59,6 @@ function App() {
     value: number
   ) => {
     const newTransport = [...data.transportation];
-    // Ensure value is treated as a number
     newTransport[index] = { ...newTransport[index], [key]: value };
     setData((prev) => ({ ...prev, transportation: newTransport }));
   };
@@ -73,25 +90,45 @@ function App() {
     }));
   };
 
-  const handleSubmit = () => {
-    setStatus("sent");
-    if (
-      data.energy.electricity < 1 ||
-      data.energy.naturalGas < 1 ||
-      data.waste.people < 1 ||
-      data.transportation.some((car) => car.miles < 1 || car.mpg < 1)
-    ) {
-      setSnackbarMessage(
-        "Please correct the errors in the form before submitting."
-      );
-    } else {
-      // console.log(JSON.stringify(data, null, 2))
-      console.log(data);
-      setSnackbarMessage("Data submitted successfully!");
+  const handleSubmit = async () => {
+    try {
+      if (
+        data.energy.electricity < 1 ||
+        data.energy.naturalGas < 1 ||
+        data.waste.people < 1 ||
+        data.transportation.some((car) => car.miles < 1 || car.mpg < 1)
+      ) {
+        setSnackbarMessage(
+          "Please correct the errors in the form before submitting."
+        );
+      } else {
+        setStatus("loading");
+        const requestResponse = await fetch(`${API_URL}/api/calculate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ household: data }),
+        });
+        const result = await requestResponse.json();
+        console.log(result);
+        setSnackbarMessage(
+          `Data submitted successfully! Footprint: ${result.totalEmissions} lbs CO₂/year`
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      setSnackbarMessage("Error submitting data. Please try again.");
+    } finally {
+      setStatus("sent");
     }
-
-    setSnackbarOpen(true);
   };
+
+  useEffect(() => {
+    if (status === "sent") {
+      setSnackbarOpen(true);
+    }
+  }, [status]);
 
   return (
     <Box
@@ -111,13 +148,11 @@ function App() {
         }}
         message={snackbarMessage}
       />
-      <Typography variant="h3" component="h1" gutterBottom align="center">
-        Household Footprint Input 🏡
-      </Typography>
+      <SvgLogo />
 
       {/* Energy Section */}
       <Box sx={{ mt: 4 }}>
-        <Typography variant="h4" component="h2" gutterBottom color="primary">
+        <Typography variant="h5" fontWeight={500} gutterBottom color="primary">
           Energy <BoltIcon color="primary" sx={{ verticalAlign: "middle" }} />
         </Typography>
         <TextField
@@ -136,7 +171,6 @@ function App() {
           margin="normal"
           InputProps={{
             inputProps: { min: 0 },
-            // Use InputAdornment to add content to the end of the input
             endAdornment: (
               <InputAdornment position="end">
                 {/* Stack arranges the buttons horizontally with small spacing */}
@@ -152,10 +186,11 @@ function App() {
                           data.energy.electricity + increment
                         )
                       }
-                      // Use the sx prop to remove horizontal padding for a compact look
                       sx={{ minWidth: 0, px: 0.8 }}
                     >
-                      +{increment}
+                      <Typography fontWeight={300} fontSize={10}>
+                        +{increment}
+                      </Typography>
                     </Button>
                   ))}
                 </Stack>
@@ -179,7 +214,6 @@ function App() {
           margin="normal"
           InputProps={{
             inputProps: { min: 0 },
-            // Use InputAdornment to add content to the end of the input
             endAdornment: (
               <InputAdornment position="end">
                 {/* Stack arranges the buttons horizontally with small spacing */}
@@ -195,10 +229,11 @@ function App() {
                           data.energy.naturalGas + increment
                         )
                       }
-                      // Use the sx prop to remove horizontal padding for a compact look
                       sx={{ minWidth: 0, px: 0.8 }}
                     >
-                      +{increment}
+                      <Typography fontWeight={300} fontSize={10}>
+                        +{increment}
+                      </Typography>
                     </Button>
                   ))}
                 </Stack>
@@ -212,7 +247,7 @@ function App() {
 
       {/* Transportation Section */}
       <Box>
-        <Typography variant="h4" component="h2" gutterBottom color="primary">
+        <Typography variant="h5" fontWeight={500} gutterBottom color="primary">
           Transportation{" "}
           <DirectionsCarIcon color="primary" sx={{ verticalAlign: "middle" }} />
         </Typography>
@@ -224,6 +259,7 @@ function App() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 mb: 1,
+                gap: 1,
               }}
             >
               <Typography variant="h6">Vehicle #{idx + 1}</Typography>
@@ -232,7 +268,9 @@ function App() {
                 onClick={removeVehicle}
                 startIcon={<DirectionsCarIcon />}
               >
-                - Remove Vehicle
+                <Typography fontWeight={300} fontSize={10}>
+                  - Remove Vehicle
+                </Typography>
               </Button>
             </Box>
             <TextField
@@ -251,7 +289,6 @@ function App() {
               margin="dense"
               InputProps={{
                 inputProps: { min: 0 },
-                // Use InputAdornment to add content to the end of the input
                 endAdornment: (
                   <InputAdornment position="end">
                     {/* Stack arranges the buttons horizontally with small spacing */}
@@ -264,10 +301,11 @@ function App() {
                           onClick={() =>
                             updateTransport(idx, "miles", car.miles + increment)
                           }
-                          // Use the sx prop to remove horizontal padding for a compact look
                           sx={{ minWidth: 0, px: 0.8 }}
                         >
-                          +{increment}
+                          <Typography fontWeight={300} fontSize={10}>
+                            +{increment}
+                          </Typography>
                         </Button>
                       ))}
                     </Stack>
@@ -299,7 +337,9 @@ function App() {
           startIcon={<DirectionsCarIcon />}
           sx={{ mt: 1 }}
         >
-          + Add Vehicle
+          <Typography fontWeight={300} fontSize={10}>
+            + Add Vehicle
+          </Typography>
         </Button>
       </Box>
 
@@ -307,7 +347,7 @@ function App() {
 
       {/* Waste Section */}
       <Box>
-        <Typography variant="h4" component="h2" gutterBottom color="primary">
+        <Typography variant="h5" fontWeight={500} gutterBottom color="primary">
           Waste{" "}
           <DeleteOutlineIcon color="primary" sx={{ verticalAlign: "middle" }} />
         </Typography>
@@ -332,7 +372,7 @@ function App() {
       <Divider sx={{ my: 4 }} />
 
       <Box>
-        <Typography variant="h4" component="h2" gutterBottom color="primary">
+        <Typography variant="h5" fontWeight={500} gutterBottom color="primary">
           Recycling{" "}
           <RecyclingIcon color="primary" sx={{ verticalAlign: "middle" }} />
         </Typography>
@@ -386,8 +426,9 @@ function App() {
         fullWidth
         size="large"
         endIcon={<CalculateIcon />}
+        loading={status === "loading"}
       >
-        Submit and Calculate Footprint 🌍
+        Calculate Footprint
       </Button>
     </Box>
   );
