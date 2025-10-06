@@ -25,6 +25,7 @@ Scripts (from `backend/`):
 - Vite
 - React + TypeScript
 - Prettier (Airbnb-style conventions)
+- MUI Components
 
 Scripts (from `frontend/`):
 
