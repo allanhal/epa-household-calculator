@@ -6,17 +6,8 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import RecyclingIcon from '@mui/icons-material/Recycling';
 import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  InputAdornment,
-  Paper,
-  Snackbar,
-  Stack,
-  TextField,
-  Typography,
+    Box, Button, Checkbox, Divider, FormControlLabel, InputAdornment, Paper, Snackbar, Stack,
+    TextField, Typography
 } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -122,6 +113,8 @@ function App() {
         });
         const result = await requestResponse.json();
         console.log(result);
+        setDialogOpen(true);
+        setDialogMessage(result);
         setSnackbarMessage(
           `Data submitted successfully! Footprint: ${result.totalEmissions} lbs CO₂/year`,
         );
