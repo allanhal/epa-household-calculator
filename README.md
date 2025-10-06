@@ -1,4 +1,4 @@
-# HCFC
+![HCFC](frontend/src/assets/hcfc_ok.svg)
 
 ## Stack Overview
 
