@@ -1,6 +1,20 @@
 // __tests__/e2e.test.js
 import request from "supertest";
-import app from "../src/app.js";
+import { jest } from "@jest/globals";
+
+// If we want to mock the prisma client, in case the database is not available
+// const mockPrisma = {
+//   household: {
+//     create: jest.fn(async ({ data }) => ({ id: 1, totalEmissions: data.totalEmissions })),
+//     aggregate: jest.fn(async () => ({ _avg: { totalEmissions: 0 }, _count: 0 })),
+//   },
+// };
+
+// await jest.unstable_mockModule("../src/config/prisma.ts", () => ({
+//   prisma: mockPrisma,
+// }));
+
+const { default: app } = await import("../src/app.ts");
 
 describe("e2e tests for EPA Calculator API", () => {
   it("should calculate emissions for sample household", async () => {

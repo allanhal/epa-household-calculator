@@ -1,5 +1,5 @@
 // __tests__/utils/emissionUtils.test.js
-import { calculateTotalEmissions } from "../../src/utils/emissionUtils.js";
+import { calculateTotalEmissions } from "../../src/utils/emissionUtils.ts";
 
 describe("calculateTotalEmissions", () => {
   it("should calculate emissions for energy", () => {

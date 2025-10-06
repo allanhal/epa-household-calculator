@@ -1,8 +1,10 @@
-import { prisma } from "../config/prisma.js";
+import { prisma } from '../config/prisma.js';
+import { HouseholdInput } from '../types.js';
 
-export async function saveHousehold(household, totalEmissions) {
+export async function saveHousehold(household: HouseholdInput, totalEmissions: number) {
   const toReturn = await prisma.household.create({
     data: {
+      // Type assertion due to Prisma auto-generated types requiring exact shape
       ...household,
       totalEmissions,
       energy: { create: household.energy },
@@ -20,7 +22,7 @@ export async function getAverageEmissions() {
     _count: true,
   });
   return {
-    totalEmissionAvg: result._avg.totalEmissions,
+    totalEmissionAvg: result._avg.totalEmissions ?? null,
     householdCount: result._count,
   };
 }

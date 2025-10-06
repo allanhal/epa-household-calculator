@@ -10,8 +10,8 @@ const mockPrisma = {
 };
 
 // Needing this because prisma client uses getters that Jest can't handle well
-await jest.unstable_mockModule("../../src/config/prisma.js", () => ({
-  default: mockPrisma,
+await jest.unstable_mockModule("../../src/config/prisma.ts", () => ({
+  prisma: mockPrisma,
 }));
 
 const mockEmissionUtils = {
@@ -36,12 +36,12 @@ const mockCalculatorService = {
 let calculate, listAverage;
 
 beforeAll(async () => {
-  await jest.unstable_mockModule("../../src/utils/emissionUtils.js", () => ({
+  await jest.unstable_mockModule("../../src/utils/emissionUtils.ts", () => ({
     calculateTotalEmissions: mockEmissionUtils.calculateTotalEmissions,
   }));
 
   await jest.unstable_mockModule(
-    "../../src/services/calculatorService.js",
+    "../../src/services/calculatorService.ts",
     () => ({
       getAverageEmissions: mockCalculatorService.getAverageEmissions,
       saveHousehold: mockCalculatorService.saveHousehold,
@@ -50,7 +50,7 @@ beforeAll(async () => {
 
   // Importing to mock those dependencies
   ({ calculate, listAverage } = await import(
-    "../../src/controllers/calculatorController.js"
+    "../../src/controllers/calculatorController.ts"
   ));
 });
 

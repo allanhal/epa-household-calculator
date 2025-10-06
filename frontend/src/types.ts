@@ -1,4 +1,4 @@
-export type Status = "idle" | "sent" | "loading";
+export type Status = 'idle' | 'sent' | 'loading';
 
 export interface EnergyData {
   electricity: number;
