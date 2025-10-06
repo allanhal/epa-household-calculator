@@ -48,13 +48,12 @@ const initialState = {
 // };
 
 function App() {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [dialogMessage, setDialogMessage] = useState<{
-    totalEmissionAvg: number;
-    householdCount: number;
-  } | null>();
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [dialogMessage, setDialogMessage] = useState<
+    React.ComponentProps<typeof DialogContentText>['children'] | null
+  >();
+  const [snackbarMessage, setSnackbarMessage] = useState<string | null>('');
   const [status, setStatus] = useState<Status>('idle');
   const [data, setData] = useState<HouseholdData>(initialState);
 
@@ -112,19 +111,19 @@ function App() {
           body: JSON.stringify({ household: data }),
         });
         const result = await requestResponse.json();
-        console.log(result);
         setDialogOpen(true);
-        setDialogMessage(result);
-        setSnackbarMessage(
-          `Data submitted successfully! Footprint: ${result.totalEmissions} lbs CO₂/year`,
+        setDialogMessage(
+          <>
+            Your Footprint: <strong>{result.totalEmissions} lbs CO₂/year</strong>
+          </>,
         );
       }
     } catch (error) {
       console.error('Error submitting data:', error);
       setSnackbarMessage('Error submitting data. Please try again.');
+      setSnackbarOpen(true);
     } finally {
       setStatus('sent');
-      setSnackbarOpen(true);
     }
   };
 
@@ -133,12 +132,19 @@ function App() {
       setStatus('loading');
       const requestResponse = await fetch(`${API_URL}/api/listAverage`);
       const result = await requestResponse.json();
-      console.log(result);
       setDialogOpen(true);
-      setDialogMessage(result);
+      setDialogMessage(
+        <>
+          Total Average Emissions:{' '}
+          <strong>{result ? `${result.totalEmissionAvg.toFixed(2)} lbs CO₂/year` : 'N/A'}</strong>
+          <br />
+          Number of Households: <strong>{result ? result.householdCount : 'N/A'}</strong>
+        </>,
+      );
     } catch (error) {
       console.error('Error submitting data:', error);
-      setDialogMessage(null);
+      setSnackbarMessage('Error submitting data. Please try again.');
+      setSnackbarOpen(true);
     } finally {
       setStatus('sent');
     }
@@ -168,14 +174,9 @@ function App() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">Current Average Emissions</DialogTitle>
+        <DialogTitle id="alert-dialog-title">Data submitted successfully!</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Total Average Emissions:{' '}
-            {dialogMessage ? `${dialogMessage.totalEmissionAvg.toFixed(2)} lbs CO₂/year` : 'N/A'}
-            <br />
-            Number of Households: {dialogMessage ? dialogMessage.householdCount : 'N/A'}
-          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">{dialogMessage}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)} autoFocus>
@@ -439,7 +440,7 @@ function App() {
         loading={status === 'loading'}
         sx={{ my: 1 }}
       >
-        View Current Average Emissions
+        View Average Emissions
       </Button>
     </Box>
   );
