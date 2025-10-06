@@ -14,11 +14,11 @@
 
 Scripts (from `backend/`):
 
-- `npm run dev` – start dev server with tsx
-- `npm run build` – compile TypeScript
-- `npm start` – run compiled server
-- `npm test` – run tests (DB mocked in tests)
-- `npm run format` / `format:check` – Prettier format/check
+- `yarn dev` – start dev server with tsx
+- `yarn build` – compile TypeScript
+- `yarn start` – run compiled server
+- `yarn test` – run tests (DB mocked in tests)
+- `yarn format` / `yarn format:check` – Prettier format/check
 
 ### Frontend
 
@@ -28,10 +28,10 @@ Scripts (from `backend/`):
 
 Scripts (from `frontend/`):
 
-- `npm run dev` – start Vite dev server
-- `npm run build` – production build
-- `npm run preview` – preview build
-- `npm run format` / `format:check` – Prettier format/check
+- `yarn dev` – start Vite dev server
+- `yarn build` – production build
+- `yarn preview` – preview build
+- `yarn format` / `yarn format:check` – Prettier format/check
 
 ### Deploy
 
