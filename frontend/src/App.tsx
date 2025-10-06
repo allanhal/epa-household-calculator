@@ -21,6 +21,7 @@ import type { HouseholdData, Status, TransportationData } from "./types";
 
 const API_URL = import.meta.env.VITE_API || "http://localhost:8080";
 
+// State with initial values for easier testing
 const initialState = {
   energy: { electricity: 1, naturalGas: 1 },
   transportation: [{ miles: 1, mpg: 1 }],
@@ -33,6 +34,7 @@ const initialState = {
   },
 };
 
+// Default state
 // const initialState = {
 //   energy: { electricity: 0, naturalGas: 0 },
 //   transportation: [{ miles: 0, mpg: 0 }],

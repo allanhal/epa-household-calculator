@@ -1,7 +1,8 @@
+// __tests__/e2e.test.js
 import request from "supertest";
 import app from "../src/app.js";
 
-describe("EPA Calculator API", () => {
+describe("e2e tests for EPA Calculator API", () => {
   it("should calculate emissions for sample household", async () => {
     const response = await request(app)
       .post("/api/calculate")

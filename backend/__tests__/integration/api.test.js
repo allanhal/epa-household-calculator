@@ -9,6 +9,11 @@ describe("EPA Household API", () => {
     expect(res.text).toContain("EPA Household Carbon Footprint");
   });
 
+  it("should respond to /api/listAverage", async () => {
+    const res = await request(app).get("/api/listAverage");
+    expect(res.status).toBe(200);
+  });
+
   it("should reject when missing household", async () => {
     const res = await request(app).post("/api/calculate").send({});
     expect(res.status).toBe(400);
