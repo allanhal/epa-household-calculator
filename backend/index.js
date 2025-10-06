@@ -2,7 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import "dotenv/config.js";
+import { PrismaClient } from "@prisma/client";
 
+const prisma = new PrismaClient();
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -32,7 +34,7 @@ app.get("/api", (req, res) => {
   res.send("EPA Household Carbon Footprint Calculator API");
 });
 
-app.post("/api/calculate", (req, res) => {
+app.post("/api/calculate", async (req, res) => {
   try {
     const { household } = req.body;
     if (!household) {
@@ -70,10 +72,44 @@ app.post("/api/calculate", (req, res) => {
       totalEmissions += wasteEmissions;
     }
 
+    const newHousehold = await prisma.household.create({
+      data: {
+        ...household,
+        totalEmissions,
+        energy: { create: household.energy },
+        waste: {
+          create: household.waste,
+        },
+        transportation: {
+          create: household.transportation,
+        },
+      },
+      include: { energy: true, waste: true, transportation: true },
+    });
+
     res.json({
-      totalEmissions: totalEmissions.toFixed(2),
+      id: newHousehold.id,
+      totalEmissions: totalEmissions,
     });
   } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/listAverage", async (req, res) => {
+  try {
+    const result = await prisma.household.aggregate({
+      _avg: { totalEmissions: true },
+      _count: true,
+    });
+
+    res.json({
+      totalEmissionAvg: result._avg.totalEmissions,
+      householdCount: result._count,
+    });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });

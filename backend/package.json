@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "start index.js",
+    "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
@@ -13,14 +13,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "latest",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10",
     "jest": "^29.6.1",
+    "nodemon": "^3.1.10",
+    "prisma": "latest",
     "supertest": "^7.1.4"
   }
 }

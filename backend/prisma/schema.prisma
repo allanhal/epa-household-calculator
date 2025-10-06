@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Household {
+  id Int @id @default(autoincrement())
+
+  transportation Transportation[]
+
+  energy   Energy @relation(fields: [energyId], references: [id])
+  energyId Int    @unique
+
+  waste   Waste @relation(fields: [wasteId], references: [id])
+  wasteId Int   @unique
+
+  totalEmissions Float
+  lastCalculated DateTime @default(now())
+}
+
+model Energy {
+  id          Int @id @default(autoincrement())
+  electricity Int @default(0)
+  naturalGas  Int @default(0)
+
+  household   Household?
+  householdId Int?
+}
+
+model Waste {
+  id              Int     @id @default(autoincrement())
+  people          Int     @default(1)
+  recyclesPaper   Boolean @default(false)
+  recyclesPlastic Boolean @default(false)
+  recyclesMetal   Boolean @default(false)
+  recyclesGlass   Boolean @default(false)
+
+  household   Household?
+  householdId Int?
+}
+
+model Transportation {
+  id    Int @id @default(autoincrement())
+  miles Int @default(0)
+  mpg   Int @default(0)
+
+  household   Household? @relation(fields: [householdId], references: [id])
+  householdId Int?
+}

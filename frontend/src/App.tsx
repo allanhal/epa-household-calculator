@@ -9,6 +9,11 @@ import {
     Box, Button, Checkbox, Divider, FormControlLabel, InputAdornment, Paper, Snackbar, Stack,
     TextField, Typography
 } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import SvgLogo from './SvgLogo';
 
@@ -16,21 +21,9 @@ import type { HouseholdData, Status, TransportationData } from "./types";
 
 const API_URL = import.meta.env.VITE_API || "http://localhost:8080";
 
-// const initialState = {
-//   energy: { electricity: 1, naturalGas: 1 },
-//   transportation: [{ miles: 1, mpg: 1 }],
-//   waste: {
-//     people: 1,
-//     recyclesPaper: false,
-//     recyclesPlastic: false,
-//     recyclesMetal: false,
-//     recyclesGlass: false,
-//   },
-// };
-
 const initialState = {
-  energy: { electricity: 0, naturalGas: 0 },
-  transportation: [{ miles: 0, mpg: 0 }],
+  energy: { electricity: 1, naturalGas: 1 },
+  transportation: [{ miles: 1, mpg: 1 }],
   waste: {
     people: 1,
     recyclesPaper: false,
@@ -40,8 +33,25 @@ const initialState = {
   },
 };
 
+// const initialState = {
+//   energy: { electricity: 0, naturalGas: 0 },
+//   transportation: [{ miles: 0, mpg: 0 }],
+//   waste: {
+//     people: 1,
+//     recyclesPaper: false,
+//     recyclesPlastic: false,
+//     recyclesMetal: false,
+//     recyclesGlass: false,
+//   },
+// };
+
 function App() {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState<{
+    totalEmissionAvg: number;
+    householdCount: number;
+  } | null>();
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [data, setData] = useState<HouseholdData>(initialState);
@@ -121,14 +131,25 @@ function App() {
       setSnackbarMessage("Error submitting data. Please try again.");
     } finally {
       setStatus("sent");
+      setSnackbarOpen(true);
     }
   };
 
-  useEffect(() => {
-    if (status === "sent") {
-      setSnackbarOpen(true);
+  const handleListAverage = async () => {
+    try {
+      setStatus("loading");
+      const requestResponse = await fetch(`${API_URL}/api/listAverage`);
+      const result = await requestResponse.json();
+      console.log(result);
+      setDialogOpen(true);
+      setDialogMessage(result);
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      setDialogMessage(null);
+    } finally {
+      setStatus("sent");
     }
-  }, [status]);
+  };
 
   return (
     <Box
@@ -148,6 +169,32 @@ function App() {
         }}
         message={snackbarMessage}
       />
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Current Average Emissions
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Total Average Emissions:{" "}
+            {dialogMessage
+              ? `${dialogMessage.totalEmissionAvg.toFixed(2)} lbs CO₂/year`
+              : "N/A"}
+            <br />
+            Number of Households:{" "}
+            {dialogMessage ? dialogMessage.householdCount : "N/A"}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
       <SvgLogo />
 
       {/* Energy Section */}
@@ -429,6 +476,17 @@ function App() {
         loading={status === "loading"}
       >
         Calculate Footprint
+      </Button>
+      <Button
+        variant="text"
+        color="info"
+        onClick={handleListAverage}
+        fullWidth
+        size="large"
+        loading={status === "loading"}
+        sx={{ my: 1 }}
+      >
+        View Current Average Emissions
       </Button>
     </Box>
   );
