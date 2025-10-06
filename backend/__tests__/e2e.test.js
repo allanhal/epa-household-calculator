@@ -1,4 +1,4 @@
-// __tests__/e2e.test.js
+// yarn test __tests__/e2e.test.js
 import request from "supertest";
 import { jest } from "@jest/globals";
 

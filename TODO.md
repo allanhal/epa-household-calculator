@@ -1,9 +1,9 @@
 ## TODO
 
-- [ ] - Frontend - Component Structure
-
 ---
 
+- [x] - Frontend - Component Structure
+- [x] - Frontend - Better documentation/review on the components
 - [x] - Make a better Readme
 - [x] - Database - Refined structure
 - [x] - Deploy

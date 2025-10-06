@@ -1,4 +1,4 @@
-// __tests__/controllers/calculatorController.test.js
+// yarn test __tests__/controllers/calculatorController.test.js
 
 import { jest } from "@jest/globals";
 

@@ -26,5 +26,5 @@ export function calculateTotalEmissions(household: HouseholdInput) {
     total += waste;
   }
 
-  return total;
+  return Math.round(total * 100) / 100;
 }

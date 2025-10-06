@@ -1,4 +1,4 @@
-// __tests__/integration/api.test.js
+// yarn test __tests__/integration/api.test.js
 import request from "supertest";
 import { jest } from "@jest/globals";
 

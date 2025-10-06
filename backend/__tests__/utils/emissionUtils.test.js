@@ -1,4 +1,4 @@
-// __tests__/utils/emissionUtils.test.js
+// yarn test __tests__/utils/emissionUtils.test.js
 import { calculateTotalEmissions } from "../../src/utils/emissionUtils.ts";
 
 describe("calculateTotalEmissions", () => {

@@ -14,7 +14,6 @@ export async function calculate(req: Request, res: Response) {
     res.json({ id: newHousehold.id, totalEmissions: total });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    // eslint-disable-next-line no-console
     console.error(err);
     res.status(500).json({ error: message });
   }
@@ -26,7 +25,6 @@ export async function listAverage(_req: Request, res: Response) {
     res.json(result);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    // eslint-disable-next-line no-console
     console.error(err);
     res.status(500).json({ error: message });
   }

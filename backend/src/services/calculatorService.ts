@@ -4,7 +4,6 @@ import { HouseholdInput } from '../types.js';
 export async function saveHousehold(household: HouseholdInput, totalEmissions: number) {
   const toReturn = await prisma.household.create({
     data: {
-      // Type assertion due to Prisma auto-generated types requiring exact shape
       ...household,
       totalEmissions,
       energy: { create: household.energy },
