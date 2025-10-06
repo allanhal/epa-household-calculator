@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../index.js";
+import app from "../src/app.js";
 
 describe("EPA Calculator API", () => {
   it("should calculate emissions for sample household", async () => {
@@ -22,6 +22,16 @@ describe("EPA Calculator API", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("totalEmissions");
 
-    expect(response.body.totalEmissions).toBe("12642.00");
+    expect(response.body.totalEmissions).toBe(12642);
+  });
+  it("should list average", async () => {
+    const response = await request(app).get("/api/listAverage").send();
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("householdCount");
+    expect(response.body).toHaveProperty("totalEmissionAvg");
+
+    expect(response.body.householdCount).toBeGreaterThanOrEqual(0);
+    expect(response.body.totalEmissionAvg).toBeGreaterThanOrEqual(0);
   });
 });
