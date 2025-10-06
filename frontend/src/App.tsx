@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import BoltIcon from '@mui/icons-material/Bolt';
 import CalculateIcon from '@mui/icons-material/Calculate';
